@@ -39,20 +39,20 @@ while (True):#while capturing video repeat this loop
     roi_gray = gray[y:y+h, x:x+w]
     roi_color = frame[y:y+h, x:x+w]
     eyes = eye_cascade.detectMultiScale(roi_gray)
-    if len(eyes) > 2:
-        continue
-    roi_eyes = []
+    # if len(eyes) > 2:
+    #     continue
+    # roi_eyes = []
     for (ex,ey,ew,eh) in eyes:
         cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-        roi_eyes.append(roi_color[ey:ey+eh, ex:ex+ew])
-    for i in range(len(roi_eyes)):
-        height, width = roi_eyes[i].shape[:2]
-        roi_eyes[i] = cv2.resize(roi_eyes[i],(5*width, 5*height), interpolation = cv2.INTER_AREA)
-        roi_eyes[i] = cv2.GaussianBlur(roi_eyes[i], (5, 5), 0)
+        # roi_eyes.append(roi_color[ey:ey+eh, ex:ex+ew])
+    # for i in range(len(roi_eyes)):
+    #     height, width = roi_eyes[i].shape[:2]
+        # roi_eyes[i] = cv2.resize(roi_eyes[i],(5*width, 5*height), interpolation = cv2.INTER_AREA)
+        # roi_eyes[i] = cv2.GaussianBlur(roi_eyes[i], (5, 5), 0)
 
         # roi_eyes[i] = cv2.cvtColor(roi_eyes[i], cv2.COLOR_BGR2GRAY)
         # _, roi_eyes[i] = cv2.threshold(roi_eyes[i],127,255,cv2.THRESH_BINARY)
-        cv2.imshow(str(i), roi_eyes[i])
+        # cv2.imshow(str(i), roi_eyes[i])
     # cv2.imshow('ROI', roi_color)
     #show the video variable "frame" on a windows with
     #the title video frame
