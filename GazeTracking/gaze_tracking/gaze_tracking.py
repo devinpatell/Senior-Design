@@ -20,6 +20,7 @@ class GazeTracking(object):
     def refresh(self):
         """Captures a new frame with the webcam and analyzes it."""
         _, self.frame = self.capture.read()
+        self.frame = cv2.flip(self.frame, 1)
         self.eyes.process(self.frame)
         self.pupil_left.process(self.eyes.frame_left)
         self.pupil_right.process(self.eyes.frame_right)
