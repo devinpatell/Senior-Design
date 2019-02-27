@@ -8,14 +8,19 @@ import numpy as np
 import cv2
 from gaze_tracking import GazeTracking
 import time
+from datetime import datetime
+
 
 RECORD_VIDEO = False
 USE_GESTURES = True
 
-SCREENSHOT_TIMER = None
-SCREENSHOT_TIMER_THRESHOLD = 3
+LEFT_LOOK = None
+LEFT_LOOK_THRESHOLD = 3
 
+RIGHT_LOOK = None
+RIGHT_LOOK_THRESHOLD = 5
 
+BLINKING_COUNT = 0
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
@@ -27,45 +32,51 @@ gaze = GazeTracking()
 #Capture video from the Wifi Connection to FPV module
 #RTSP =(Real Time Streaming Protocol)
 # cap = cv2.VideoCapture('rtsp://192.168.100.1/cam1/mpeg4')
-# fps = cv2.CAP_PROP_FPS
 i = 0
 print('start')
 while True:
     current_time = time.time()
-    if(SCREENSHOT_TIMER != None):
-        if(current_time > (SCREENSHOT_TIMER + SCREENSHOT_TIMER_THRESHOLD)):
-            SCREENSHOT_TIMER = None
+    if(LEFT_LOOK != None):
+        if(current_time > (LEFT_LOOK + LEFT_LOOK_THRESHOLD)):
+            LEFT_LOOK = None
+    if(RIGHT_LOOK != None):
+        if(current_time > (RIGHT_LOOK + RIGHT_LOOK_THRESHOLD)):
+            RIGHT_LOOK = None
+
     i += 1
-    # ret, frame = cap.read()
-    # cv2.imshow('Drone Feed', frame)
-    if True: #i % 3 == 0:
+    # ret, drone_frame = cap.read()
+    # cv2.imshow('Drone Feed', drone_frame)
+    if i % 3 == 0:
         gaze.refresh()
         frame = gaze.main_frame(True)
         h,w = frame.shape[:2]
-        # text = ""
-        #
-        # if gaze.is_blinking():
-        #     text = "Blinking"
-        # elif gaze.is_right():
-        #     text = "Looking right"
-        # elif gaze.is_left():
-        #     text = "Looking left"
-        # elif gaze.is_center():
-        #     text = "Looking center"
-
-        # cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (255, 0, 0), 2)
-
+        if gaze.is_blinking():
+            BLINKING_COUNT += 1
+        else:
+            BLINKING_COUNT = 0
         left_pupil = gaze.pupil_left_coords()
         right_pupil = gaze.pupil_right_coords()
         cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (255, 0, 0), 1)
         cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (255, 0, 0), 1)
 
+        if(BLINKING_COUNT > 30):
+            print('EYES CLOSED')
+            BLINKING_COUNT = 0
+
         if(left_pupil):
             left_x, _ = left_pupil
-            print(left_x, (w-480))
-            if(SCREENSHOT_TIMER == None and left_x < (w-480)):
-                print('caputure screenshot')
-                SCREENSHOT_TIMER = time.time()
+            # print(left_x, (w-480))
+            if(LEFT_LOOK == None and left_x < (w-480)):
+                print('Caputured Screenshot')
+                cv2.imwrite("C:\\Users\\devin\\Documents\\Year 4\\Senior Design\\Pictures\\" + str(datetime.now()).replace(' ','').replace(':','-') + '.jpg', drone_frame)
+                LEFT_LOOK = time.time()
+
+        if(right_pupil):
+            right_x, _ = right_pupil
+            # print(right_x, (w-480))
+            if(RIGHT_LOOK == None and right_x > (w-200)):
+                print('360 + 9 - 300')
+                RIGHT_LOOK = time.time()
 
         # if RECORD_VIDEO:
         #     out.write(frame)
