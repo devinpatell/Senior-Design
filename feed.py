@@ -1,4 +1,5 @@
 import CoDrone
+from CoDrone import Direction,Degree
 drone = CoDrone.CoDrone()
 drone.connect()
 
@@ -65,10 +66,14 @@ def land():
     drone.set_throttle(-20)
     drone.move(1)
     drone.land()
+def turn360():
+    drone.rotate180()
+
+
 
 runkey = { 255: None, ord('d') :dKey,32: takeoff, ord('t') : land, ord('i') : upKey,
           ord('j') : leftKey, ord('k') : downKey, ord('l') : rightKey, ord('w') : wKey, ord('s') : sKey,
-          ord('a') : aKey}
+          ord('a') : aKey, ord('o'):turn360}
 
 
 
